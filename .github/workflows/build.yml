@@ -25,7 +25,6 @@ on:
         default: "dispatch"
 
 env:
-  BUILDX_CACHE_DIR: ~/.cache/buildx
   CURL_CACHE_DIR: ~/.cache/curl
   IMAGE_NAME: cisagov/example
   PIP_CACHE_DIR: ~/.cache/pip
@@ -291,15 +290,6 @@ jobs:
         uses: docker/setup-qemu-action@v3
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
-      - name: Cache Docker layers
-        uses: actions/cache@v3
-        env:
-          BASE_CACHE_KEY: buildx-${{ runner.os }}-
-        with:
-          path: ${{ env.BUILDX_CACHE_DIR }}
-          key: ${{ env.BASE_CACHE_KEY }}${{ github.sha }}
-          restore-keys: |
-            ${{ env.BASE_CACHE_KEY }}
       - name: Create dist directory
         run: mkdir -p dist
       - name: Build image
@@ -308,8 +298,8 @@ jobs:
         with:
           build-args: |
             VERSION=${{ needs.prepare.outputs.source_version }}
-          cache-from: type=local,src=${{ env.BUILDX_CACHE_DIR }}
-          cache-to: type=local,dest=${{ env.BUILDX_CACHE_DIR }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
           context: .
           file: ./Dockerfile
           outputs: type=docker,dest=dist/image.tar
@@ -444,15 +434,6 @@ jobs:
         uses: docker/setup-qemu-action@v3
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
-      - name: Cache Docker layers
-        uses: actions/cache@v3
-        env:
-          BASE_CACHE_KEY: buildx-${{ runner.os }}-
-        with:
-          path: ${{ env.BUILDX_CACHE_DIR }}
-          key: ${{ env.BASE_CACHE_KEY }}${{ github.sha }}
-          restore-keys: |
-            ${{ env.BASE_CACHE_KEY }}
       - name: Create cross-platform support Dockerfile-x
         run: ./buildx-dockerfile.sh
       - name: Build and push platform images to registries
@@ -461,8 +442,8 @@ jobs:
         with:
           build-args: |
             VERSION=${{ needs.prepare.outputs.source_version }}
-          cache-from: type=local,src=${{ env.BUILDX_CACHE_DIR }}
-          cache-to: type=local,dest=${{ env.BUILDX_CACHE_DIR }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
           context: .
           file: ./Dockerfile-x
           platforms: ${{ env.PLATFORMS }}
