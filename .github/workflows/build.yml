@@ -10,22 +10,22 @@ on:
     branches:
       - "**"
     tags:
-      - "v*.*.*"
+      - v*.*.*
   repository_dispatch:
     # Respond to rebuild requests. See: https://github.com/cisagov/action-apb/
     types:
       - apb
   schedule:
-    - cron: "0 10 * * *"  # everyday at 10am
+    - cron: 0 10 * * *  # everyday at 10am
   workflow_dispatch:
     inputs:
       image-tag:
-        default: "dispatch"
-        description: "Tag to apply to pushed images"
+        default: dispatch
+        description: Tag to apply to pushed images
         required: true
       remote-shell:
-        default: "false"
-        description: "Debug with remote shell"
+        default: false
+        description: Debug with remote shell
         required: true
 
 # Set a default shell for any run steps. The `-Eueo pipefail` sets errtrace,
