@@ -20,7 +20,7 @@ on:
     branches-ignore:
       - dependabot/**
   schedule:
-    - cron: '0 21 * * 6'
+    - cron: 0 21 * * 6
 
 jobs:
   diagnostics:
